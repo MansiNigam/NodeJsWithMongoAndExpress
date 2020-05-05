@@ -40,3 +40,18 @@ User.findOne({_id: jwt_payload._id}, (err,user) => {
 })
 }));
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+
+exports.verifyAdmin = function(req, res, next) {
+    User.findOne({_id: req.user._id})
+    .then((user) => {
+        if(user.admin){
+            next();
+        }
+        else{
+            var err = new Error('You are not authorized to perform this operation');
+            err.status = 403;
+            return next(err);
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err))
+  };
